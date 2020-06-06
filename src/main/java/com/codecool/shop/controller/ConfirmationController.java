@@ -1,7 +1,9 @@
 package com.codecool.shop.controller;
 
 import com.codecool.shop.config.TemplateEngineUtil;
+import com.codecool.shop.dao.CartDao;
 import com.codecool.shop.dao.OrderDao;
+import com.codecool.shop.dao.implementation.CartDaoJDBC;
 import com.codecool.shop.dao.implementation.OrderDaoJDBC;
 import com.codecool.shop.model.Cart;
 import com.codecool.shop.model.ListItem;
@@ -10,6 +12,7 @@ import com.codecool.shop.model.User;
 import com.codecool.shop.utils.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 
@@ -27,15 +30,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 @WebServlet(urlPatterns = {"/payment-confirmation"})
 public class ConfirmationController extends HttpServlet {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ConfirmationController.class);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         TemplateEngine engine = TemplateEngineUtil.getTemplateEngine(req.getServletContext());
         WebContext context = new WebContext(req, resp, req.getServletContext());
+        logger.info("Reached confirmation page - doPost.");
 
         HttpSession session = req.getSession(false);
         Cart tempCart = (Cart) session.getAttribute("cart");
@@ -64,6 +70,7 @@ public class ConfirmationController extends HttpServlet {
         } else {
             context.setVariable("username", "null");
         }
+
         int cartSize = 0;
         tempCart = (Cart) session.getAttribute("cart");
         if (tempCart == null) {
@@ -72,6 +79,7 @@ public class ConfirmationController extends HttpServlet {
             cartSize = tempCart.getCartNumberOfProducts();
             context.setVariable("cartSize", cartSize);
         }
+        logger.info(String.format("Order %d payment confirmed.", tempOrder.getId()));
         engine.process("payment-confirmation.html", context, resp.getWriter());
 
         // clearing the cart and the order from the session as the purchase is completed and backup isn't needed
@@ -166,6 +174,8 @@ public class ConfirmationController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         TemplateEngine engine = TemplateEngineUtil.getTemplateEngine(req.getServletContext());
         WebContext context = new WebContext(req, resp, req.getServletContext());
+
+        logger.info("Reached confirmation page - doGet.");
 
 //        OrderDao orderDataStore = OrderDaoMem.getInstance();
 //        Currency orderCurrency = orderDataStore.getItems().get(0).getDefaultCurrency();

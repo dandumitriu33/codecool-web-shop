@@ -8,9 +8,9 @@
 <div th:replace="navbar.html :: copy"></div>
 
 <div class="container">
-    <div class="jumbotron text-center">
-        <h1>Cart</h1>
-    </div>
+    <br>
+        <h1 class="text-center">Cart</h1>
+
 
     <div class="row">
         <div class="col text-center">
@@ -23,14 +23,16 @@
                 </div>
                 <table class="table table-borderless">
                     <thead class="table">
+                    <th>Product Image</th>
                     <th>
                         Product Name
                     </th>
-                    <th>
-                        Product ID
-                    </th>
+
                     <th>
                         Item Count
+                    </th>
+                    <th>
+                        Price
                     </th>
                     <th>
                         Subtotal
@@ -44,9 +46,11 @@
                     </thead>
                     <tbody>
                     <tr th:each="instance : ${cartContents}">
+                        <td><img alt="" class=""
+                                                                             height="114" src="http://placehold.it/400x250/000/fff" th:attr="src='/static/img/' + ${instance.key.getProductImage()}" width="100px"/></td>
                         <td th:text="${instance.key.getProductName()}"></td>
-                        <td th:text="${instance.key.getProductId()}"></td>
                         <td th:text="${instance.value}"></td>
+                        <td th:text="${ #numbers.formatDecimal(instance.key.getProductPrice(), 0, 'COMMA',2,'POINT')}  + ' ' + ${defaultCurrency}"></td>
                         <td th:text="${ #numbers.formatDecimal(instance.value * instance.key.getProductPrice(), 0, 'COMMA',2,'POINT')}  + ' ' + ${defaultCurrency}"></td>
                         <td>
                             <form action="/cart" method="post">
