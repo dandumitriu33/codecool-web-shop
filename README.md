@@ -1,5 +1,8 @@
 # Codecool Online Shop
 
+Original project
+https://github.com/stefan-gherman/Codecool_Web_Shop
+
 Java SE: Web Project skeleton
 
 # Install
